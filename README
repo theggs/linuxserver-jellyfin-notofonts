@@ -1,0 +1,11 @@
+Jellyfin need CJK fonts to create some media post and subtitle etc. But it is not contained in the docker image provided.
+One resolution is use linuxserver/jellyfin image and install it when init:
+add environment vars in docker-compose:
+```
+    environment:
+      - DOCKER_MODS=linuxserver/mods:universal-package-install
+      - INSTALL_PACKAGES=fonts-noto-cjk-extra
+```
+It will take a long time for installing.
+
+This image is used to prebuild a linuxserver/jellyfin image that contain fonts-noto-cjk-extra. So the container env can have cjk fonts.
