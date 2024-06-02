@@ -13,14 +13,14 @@ This image is used to prebuild a linuxserver/jellyfin image that contain fonts-n
 
 # How to use
 image can be access from:
-theggs/linuxserver-jellyfin-notofonts:10.8.13
+theggs/linuxserver-jellyfin-notofonts:10.9.4
 
 As it is based on linuxserver/jellyfin, just replace it in the docker command or docker-compose yaml field `image` in linuxserver instruction https://docs.linuxserver.io/images/docker-jellyfin/. For example:
 ```yaml
 ---
 services:
   jellyfin:
-    image: theggs/linuxserver-jellyfin-notofonts:10.8.13
+    image: theggs/linuxserver-jellyfin-notofonts:10.9.4
     container_name: jellyfin
     environment:
       - PUID=1000
