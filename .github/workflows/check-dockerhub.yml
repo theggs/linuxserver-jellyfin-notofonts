@@ -2,7 +2,7 @@ name: Check Docker Hub for New Tags
 
 on:
   schedule:
-    - cron: '0 0/6/12/18 * * *'  # 每小时检查一次
+    - cron: '0 0/12 * * *'  # 每小时检查一次
   workflow_dispatch:      # 允许手动触发
 
 jobs:
