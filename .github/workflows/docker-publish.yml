@@ -71,6 +71,7 @@ jobs:
             type=semver,pattern={{version}}
 
       - name: Build and push Docker images
+        id: build-and-push
         uses: docker/build-push-action@v5.0.0
         with:
           context: .
@@ -88,4 +89,3 @@ jobs:
           TAGS: ${{ steps.meta.outputs.tags }}
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
-
