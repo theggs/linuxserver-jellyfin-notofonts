@@ -13,16 +13,30 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Ensure version.txt exists
+      run: |
+        if [ ! -f version.txt ]; then
+          echo "0.0.0" > version.txt
+        fi
+
     - name: Get latest tag from Docker Hub
       id: get_latest_tag
       run: |
         LATEST_TAG=$(curl -s https://hub.docker.com/v2/repositories/linuxserver/jellyfin/tags | jq -r '.results[].name' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1)
+        if [ -z "$LATEST_TAG" ]; then
+          echo "Failed to get the latest tag from Docker Hub" >&2
+          exit 1
+        fi
         echo "LATEST_TAG=${LATEST_TAG}" >> $GITHUB_ENV
 
     - name: Get current tag from version.txt
       id: get_current_tag
       run: |
         CURRENT_TAG=$(cat version.txt)
+        if [ -z "$CURRENT_TAG" ]; then
+          echo "Failed to get the current tag from version.txt" >&2
+          exit 1
+        fi
         echo "CURRENT_TAG=${CURRENT_TAG}" >> $GITHUB_ENV
 
     - name: Compare tags
@@ -52,3 +66,16 @@ jobs:
         git commit -m "Update version to ${LATEST_TAG}"
         git tag ${LATEST_TAG}
         git push origin HEAD --tags
+      continue-on-error: true
+
+    - name: Trigger Docker Publish Release if commit and push failed
+      if: failure()
+      uses: actions/github-script@v6
+      with:
+        script: |
+          github.rest.actions.createWorkflowDispatch({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            workflow_id: 'docker-publish.yml',
+            ref: context.ref
+          })
