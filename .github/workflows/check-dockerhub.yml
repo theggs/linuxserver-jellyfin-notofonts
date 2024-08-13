@@ -77,5 +77,8 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             workflow_id: 'docker-publish.yml',
-            ref: context.ref
+            ref: '${{ github.ref }}',
+            inputs: {
+              tag: '${{ env.LATEST_TAG }}'
+            }
           })
