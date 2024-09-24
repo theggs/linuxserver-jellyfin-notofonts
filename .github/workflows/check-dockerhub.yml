@@ -66,10 +66,26 @@ jobs:
         git commit -m "Update version to ${LATEST_TAG}"
         git tag ${LATEST_TAG}
         git push origin HEAD --tags
-      continue-on-error: true
 
-    - name: Trigger Docker Publish Release if commit and push failed
-      if: failure()
+  trigger_docker_publish:
+    runs-on: ubuntu-latest
+    needs: check_new_tag
+    if: failure()  # 仅在 check_new_tag 作业失败时运行
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Get latest Git tag
+      id: get_latest_git_tag
+      run: |
+        LATEST_GIT_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
+        if [ -z "$LATEST_GIT_TAG" ]; then
+          echo "Failed to get the latest Git tag" >&2
+          exit 1
+        fi
+        echo "LATEST_GIT_TAG=${LATEST_GIT_TAG}" >> $GITHUB_ENV
+
+    - name: Trigger Docker Publish Release
       uses: actions/github-script@v6
       with:
         script: |
@@ -77,8 +93,5 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             workflow_id: 'docker-publish.yml',
-            ref: '${{ github.ref }}',
-            inputs: {
-              tag: '${{ env.LATEST_TAG }}'
-            }
+            ref: 'refs/tags/${{ env.LATEST_GIT_TAG }}'
           })
