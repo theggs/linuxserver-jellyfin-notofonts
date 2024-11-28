@@ -76,15 +76,15 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Get latest Git tag
-      id: get_latest_git_tag
+    - name: Get current tag from version.txt
+      id: get_current_tag
       run: |
-        LATEST_GIT_TAG=env.CURRENT_TAG
-        if [ -z "$LATEST_GIT_TAG" ]; then
-          echo "Failed to get the latest Git tag" >&2
+        CURRENT_TAG=$(cat version.txt)
+        if [ -z "$CURRENT_TAG" ]; then
+          echo "Failed to get the current tag from version.txt" >&2
           exit 1
         fi
-        echo "LATEST_GIT_TAG=${LATEST_GIT_TAG}" >> $GITHUB_ENV
+        echo "CURRENT_TAG=${CURRENT_TAG}" >> $GITHUB_ENV
 
     - name: Trigger Docker Publish Release
       uses: actions/github-script@v6
@@ -94,5 +94,5 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             workflow_id: 'docker-publish.yml',
-            ref: 'refs/tags/${{ env.LATEST_GIT_TAG }}'
+            ref: 'refs/tags/${{ env.CURRENT_TAG }}'
           })
