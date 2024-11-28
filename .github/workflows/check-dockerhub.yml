@@ -18,7 +18,8 @@ jobs:
         if [ ! -f version.txt ]; then
           echo "0.0.0" > version.txt
         fi
-
+    - name: Fetch all tags
+      run: git fetch --tags
     - name: Get latest tag from Docker Hub
       id: get_latest_tag
       run: |
