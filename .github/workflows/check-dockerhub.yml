@@ -79,7 +79,7 @@ jobs:
     - name: Get latest Git tag
       id: get_latest_git_tag
       run: |
-        LATEST_GIT_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
+        LATEST_GIT_TAG=env.CURRENT_TAG
         if [ -z "$LATEST_GIT_TAG" ]; then
           echo "Failed to get the latest Git tag" >&2
           exit 1
