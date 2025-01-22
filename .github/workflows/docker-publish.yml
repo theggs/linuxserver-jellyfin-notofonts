@@ -1,6 +1,7 @@
 name: Docker Publish Release
 
 on:
+  workflow_dispatch: {}
   push:
     tags: [ '*.*.*' ]
 
